@@ -6,8 +6,8 @@ services:
     ports:
       - "1881:1880"
     volumes:
-      - /opt/cartloading/nodered/data:/data
-      - /home/afi/Documents/Teja/shared_scripts:/scripts:ro
+      - nodered-data:/data  # Named volume with custom location
+      - /home/orin/Documents/Docker_test/shared_scripts:/scripts:ro
       - /var/run/docker.sock:/var/run/docker.sock # for monitoring containers from node-red (optional)
     networks:
       - cartloading-network
@@ -51,7 +51,8 @@ services:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=all
       - TZ=America/New_York
-    command: ["python3", "/workspace/scripts/opencv_api_server.py"]
+    command: ["tail", "-f", "/dev/null"] 
+    #command: ["python3", "/workspace/scripts/opencv_api_server.py"]
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5001/health || exit 1"]
       interval: 30s
@@ -76,3 +77,11 @@ networks:
   cartloading-network:
     driver: bridge
     name: cartloading-network
+
+volumes:
+  nodered-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/cartloading/nodered/data
